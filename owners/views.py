@@ -9,38 +9,6 @@ from django.views import View
 from owners.models import Owner, Dog
 
 
-# class OwnersView(View):
-#     def post(self, request):
-#         data = json.loads(request.body)
-
-#         owner = Owner.objects.create(name=data['owner'])
-#         Owner.objects.create(
-#             email=data['owner_email'],
-#             age=data['owner_age']
-#         )
-#         Dog.objects.create(
-#             owner=owner,
-#             name=data['dog'],
-#             age=data['dog_age']
-#         )
-#         return JsonResponse({'MESSAGE': 'CREATED'}, status=201)
-
-#     def get(self, request):
-#         owners = Owner.objects.all()
-#         results = []
-#         for owner in owners:
-#             results.append(
-#                 {
-#                     "owner": Owner.name,
-#                     "owner_email": Owner.email,
-#                     "owner_age": Owner.age,
-#                     "dog": Dog.name,
-#                     "dog_age": Dog.age
-#                 }
-#             )
-#         return JsonResponse({'results': results}, status=200)
-
-
 class OwnersView(View):
     def post(self, request):
         data = json.loads(request.body)
@@ -56,14 +24,41 @@ class OwnersView(View):
         owners = Owner.objects.all()
         results = []
         for owner in owners:
+            dog_list = []
             results.append(
                 {
                     "owner": owner.name,
                     "owner_email": owner.email,
                     "owner_age": owner.age,
+                    "dog_list": dog_list
                 }
             )
+            dogs = owner.dog_set.all()
+            for dog in dogs:
+                dog_list.append(
+                    {
+                        "dog_name": dog.name,
+                        "dog_age": dog.age,
+                    }
+                )
+
         return JsonResponse({'results': results}, status=200)
+
+    # def get(self, request):
+    #     owners = Owner.objects.all()
+
+    #     results = []
+    #     for owner in owners:
+    #         dogs = owner.dog_set.values()
+    #         results.append(
+    #             {
+    #                 "owner": owner.name,
+    #                 "owner_email": owner.email,
+    #                 "owner_age": owner.age,
+    #                 "dog_list": dogs.name,
+    #             }
+    #         )
+    #     return JsonResponse({'results': results}, status=200)
 
 
 class DogsView(View):
